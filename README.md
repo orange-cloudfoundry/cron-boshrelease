@@ -29,12 +29,26 @@ properties:
       VAR1: val1
       VAR2: val2
     entries: # a list of key-value objects representing cron entries
-    - command: echo hi!
+    # run a commmand already installed
+    - command: /usr/bin/touch /tmp/test-command-cron
       minute: '*'
       hour: '*'
       day: '*'
       month: '*'
       wday: '*'
+      user: vcap
+    # or specify a script to install and run
+    - script: |
+        #!/bin/bash
+
+        /usr/bin/touch /tmp/test-script-cron
+      minute: '*'
+      hour: '*'
+      day: '*'
+      month: '*'
+      wday: '*'
+      user: vcap
+
 ```
 
 When deployed, this release will generate a crontab, stick it in /etc/cron.d/cron-boshrelease-crontab, and reload the running cron process to read the new crontab.

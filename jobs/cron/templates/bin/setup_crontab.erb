@@ -1,0 +1,30 @@
+#!/bin/bash
+
+set -exu
+
+CONFIG_DIR=/var/vcap/jobs/cron/config
+
+mkdir -p ${CONFIG_DIR}
+rm -f ${CONFIG_DIR}/entry-*
+
+read -r -d '' CRONTAB <<'EOF'
+<% p("cron.variables", {}).each do |k, v| %>
+<%= k %>=<%= v %>
+<% end %>
+EOF
+
+<% p("cron.entries", []).each do |entry| %>
+<% if entry.key?("script") %>
+ENTRY=$(mktemp ${CONFIG_DIR}/entry-XXXXXX)
+cat << 'EOF' > ${ENTRY}
+<%= entry['script'] %>
+EOF
+chmod 755 ${ENTRY}
+<% else %>
+ENTRY="<%= entry["command"].gsub(/([^\\])%/, '\1\%') %>"
+<% end %>
+
+CRONTAB="${CRONTAB}\n<%= entry["minute"] %> <%= entry["hour"] %> <%= entry["day"] %> <%= entry["month"] %> <%= entry["wday"] %> <%= entry["user"] %> ${ENTRY}"
+<% end %>
+
+echo -e "$CRONTAB" > /etc/cron.d/cron-boshrelease-crontab

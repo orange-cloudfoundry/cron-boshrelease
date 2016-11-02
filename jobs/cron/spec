@@ -34,10 +34,12 @@ properties:
       If command and script are specified for the same entry, the contents of script will be executed, and command ignored
     example:
     - command: /var/vcap/packages/mypackage/bin/myhourlyscript
-      script: |
-        #!/bin/bash
+      script:
+        name: touch.sh
+        contents: |
+          #!/bin/bash
 
-        touch /tmp/i-am-running
+          touch /tmp/i-am-running
 
       minute: 0
       hour: '*'

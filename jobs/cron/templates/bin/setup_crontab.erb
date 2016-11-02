@@ -1,11 +1,11 @@
 #!/bin/bash
 
-set -exu
+set -xu
 
 CONFIG_DIR=/var/vcap/jobs/cron/config
 
 mkdir -p ${CONFIG_DIR}
-rm -f ${CONFIG_DIR}/entry-*
+rm -f ${CONFIG_DIR}/*
 
 read -r -d '' CRONTAB <<'EOF'
 <% p("cron.variables", {}).each do |k, v| %>
@@ -15,9 +15,9 @@ EOF
 
 <% p("cron.entries", []).each do |entry| %>
 <% if entry.key?("script") %>
-ENTRY=$(mktemp ${CONFIG_DIR}/entry-XXXXXX)
+ENTRY="${CONFIG_DIR}/<%= entry['script']['name'].gsub(/[-\/.]+/, '-').gsub(/^-|-$/, '') %>"
 cat << 'EOF' > ${ENTRY}
-<%= entry['script'] %>
+<%= entry['script']['contents'] %>
 EOF
 chmod 755 ${ENTRY}
 <% else %>

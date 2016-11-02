@@ -38,10 +38,12 @@ properties:
       wday: '*'
       user: vcap
     # or specify a script to install and run
-    - script: |
-        #!/bin/bash
+    - script:
+        name: touch.sh
+        contents: |
+          #!/bin/bash
 
-        /usr/bin/touch /tmp/test-script-cron
+          /usr/bin/touch /tmp/test-script-cron
       minute: '*'
       hour: '*'
       day: '*'

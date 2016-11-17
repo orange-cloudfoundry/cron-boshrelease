@@ -17,8 +17,11 @@ case $1 in
     # store pid in $PIDFILE
     echo $$ > $PIDFILE
 
-    cp /var/vcap/jobs/cron/config/cron-boshrelease-crontab /etc/cron.d/
-    touch /etc/crontab # touch to help ensure cron reloads
+    # generate our cron tab
+    /var/vcap/jobs/cron/bin/setup_crontab
+
+    # touch to help ensure cron reloads
+    touch /etc/crontab
 
     exec chpst -u vcap:vcap /var/vcap/jobs/cron/bin/sleeper \
          >>$LOG_DIR/$JOB_NAME.stdout.log \
